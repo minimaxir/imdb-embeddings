@@ -1,0 +1,6 @@
+.env
+test.ipynb
+*.jsonl
+.venv
+.DS_Store
+embeddings.*
