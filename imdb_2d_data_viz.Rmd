@@ -1,0 +1,69 @@
+```{r}
+library(tidyverse)
+library(scales)
+library(RColorBrewer)
+library(arrow)
+
+caption <- "Max Woolf — minimaxir.com"
+
+sessionInfo()
+```
+
+```{r}
+theme_set(theme_minimal(base_size = 8, base_family = "Overpass") +
+  theme(
+    plot.title = element_text(size = 8, face = "bold"),
+    plot.subtitle = element_text(color = "#666666", size = 6),
+    axis.title.x = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    plot.caption = element_text(size = 5, color = "#969696"),
+    plot.background = element_rect(fill = "#FFFFFF", color = "#FFFFFF"),
+    legend.title = element_text(size = 8),
+    # legend.key.width = unit(0.25, unit = "cm"),
+    # panel.grid.minor = element_blank()
+  ))
+```
+
+
+```{r}
+df <- read_parquet("/Users/maxwoolf/Downloads/imdb_embeddings_2d.parquet")
+
+df %>% head()
+```
+
+## 2D UMAP Projection
+
+```{r}
+plot <- ggplot(df, aes(x = x_2d, y = y_2d, color = averageRating)) +
+  geom_point(size = 0.6, stroke = 0, alpha = 0.8) +
+  # scale_x_continuous(limits = c(-4.7, 4.7)) +
+  # scale_y_continuous(limits = c(-5.2, 4.7)) +
+  # scale_fill_viridis_c() +
+  scale_color_distiller(palette = "PRGn", breaks = seq(1, 10, 1)) +
+  # guides(fill = guide_legend(
+  #   override.aes = list(size = 2, alpha = 1, stroke = 0.8),
+  #   theme = theme(legend.byrow = TRUE),
+  #   nrow = 1
+  # )) +
+  labs(
+    title = "2D UMAP Projection of IMDb Movie Embeddings",
+    subtitle = "All movies with atleast 30 votes until 2025-02-16. Colors represent average rating.",
+    caption = caption
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 5, margin = margin(c(0.05, 0.0, 0.0, 0.0), unit = "cm")),
+    legend.key.width = unit(1.5, unit = "cm"),
+    legend.key.height = unit(0.25, unit = "cm"),
+    legend.margin = margin(c(0.0, 0.5, -0.2, 0.4), unit = "cm"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+  )
+
+ggsave("imdb_umap_rating.png", plot, width = 4, height = 4)
+```
