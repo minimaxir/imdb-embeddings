@@ -35,11 +35,11 @@ df %>% head()
 
 ```{r}
 plot <- ggplot(df, aes(x = x_2d, y = y_2d, color = averageRating)) +
-  geom_point(size = 0.6, stroke = 0, alpha = 0.8) +
+  geom_point(size = 0.4, stroke = 0.0, alpha = 0.8) +
   # scale_x_continuous(limits = c(-4.7, 4.7)) +
   # scale_y_continuous(limits = c(-5.2, 4.7)) +
   # scale_fill_viridis_c() +
-  scale_color_distiller(palette = "PRGn", breaks = seq(1, 10, 1)) +
+  scale_color_distiller(palette = "PRGn", breaks = seq(1, 10, 1), direction = 1) +
   # guides(fill = guide_legend(
   #   override.aes = list(size = 2, alpha = 1, stroke = 0.8),
   #   theme = theme(legend.byrow = TRUE),
@@ -47,7 +47,7 @@ plot <- ggplot(df, aes(x = x_2d, y = y_2d, color = averageRating)) +
   # )) +
   labs(
     title = "2D UMAP Projection of IMDb Movie Embeddings",
-    subtitle = "All movies with atleast 30 votes until 2025-02-16. Colors represent average rating.",
+    subtitle = "All movies with atleast 30 user votes until 2025-05-10. Colors represent average rating.",
     caption = caption
   ) +
   theme(
