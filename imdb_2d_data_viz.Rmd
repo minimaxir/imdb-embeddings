@@ -82,11 +82,13 @@ df |>
   write_csv("/Users/maxwoolf/Downloads/cluster_1.csv")
 ```
 
-All 2003 movies apparently
+All 2003 movies apparently.
 
 ```{r}
 df |>
-  filter(x_2d >= 1, x_2d <= 4, y_2d >= -7, y_2d <= -3) |>
+  filter(x_2d >= 1, x_2d <= 2.5, y_2d >= -7, y_2d <= -4) |>
   left_join(all_data) |>
   write_csv("/Users/maxwoolf/Downloads/cluster_2.csv")
 ```
+
+All 2024 movies apparently.
