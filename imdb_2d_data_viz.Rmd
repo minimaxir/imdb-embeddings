@@ -28,7 +28,7 @@ theme_set(theme_minimal(base_size = 8, base_family = "Overpass") +
 ```{r}
 df <- read_parquet("/Users/maxwoolf/Downloads/imdb_embeddings_2d.parquet")
 
-df %>% head()
+df |> head()
 ```
 
 ## 2D UMAP Projection
@@ -38,16 +38,10 @@ plot <- ggplot(df, aes(x = x_2d, y = y_2d, color = averageRating)) +
   geom_point(size = 0.4, stroke = 0.0, alpha = 0.8) +
   # scale_x_continuous(limits = c(-4.7, 4.7)) +
   # scale_y_continuous(limits = c(-5.2, 4.7)) +
-  # scale_fill_viridis_c() +
   scale_color_distiller(palette = "PRGn", breaks = seq(1, 10, 1), direction = 1) +
-  # guides(fill = guide_legend(
-  #   override.aes = list(size = 2, alpha = 1, stroke = 0.8),
-  #   theme = theme(legend.byrow = TRUE),
-  #   nrow = 1
-  # )) +
   labs(
-    title = "2D UMAP Projection of IMDb Movie Embeddings",
-    subtitle = "All movies with atleast 30 user votes until 2025-05-10. Colors represent average rating.",
+    title = sprintf("2D UMAP Projection of %s IMDb Movie Embeddings", df |> nrow() |> comma()),
+    subtitle = "All movies with atleast 30 user votes until 2025-05-10. Colors represent average IMDb user rating.",
     caption = caption
   ) +
   theme(
@@ -66,4 +60,33 @@ plot <- ggplot(df, aes(x = x_2d, y = y_2d, color = averageRating)) +
   )
 
 ggsave("imdb_umap_rating.png", plot, width = 4, height = 4)
+```
+
+Investigate that weird top cluster.
+
+```{r}
+all_data <- read_parquet("/Users/maxwoolf/Downloads/movie_data_plus_embeds_all.parquet", col_select = c("tconst", "json", "averageRating", "numVotes", "startYear"))
+
+df |>
+  filter(x_2d <= -3, y_2d >= 10) |>
+  left_join(all_data) |>
+  write_csv("/Users/maxwoolf/Downloads/top_cluster.csv")
+```
+
+Appears to be 2008 movies only. Check other clusters.
+
+```{r}
+df |>
+  filter(x_2d <= -4.5, y_2d >= -1, y_2d <= 1) |>
+  left_join(all_data) |>
+  write_csv("/Users/maxwoolf/Downloads/cluster_1.csv")
+```
+
+All 2003 movies apparently
+
+```{r}
+df |>
+  filter(x_2d >= 1, x_2d <= 4, y_2d >= -7, y_2d <= -3) |>
+  left_join(all_data) |>
+  write_csv("/Users/maxwoolf/Downloads/cluster_2.csv")
 ```
