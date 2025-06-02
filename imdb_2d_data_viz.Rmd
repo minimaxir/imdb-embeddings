@@ -92,3 +92,31 @@ df |>
 ```
 
 All 2024 movies apparently.
+
+```{r}
+plot <- ggplot(df |> left_join(all_data) |> filter(startYear >= 1996), aes(x = x_2d, y = y_2d, color = factor(startYear))) +
+  geom_point(size = 0.3, stroke = 0.0, alpha = 0.5) +
+  scale_color_hue(guide = "none") +
+  labs(
+    title = "2D UMAP Projection of IMDb Movie Embeddings, Faceted by Release Year",
+    subtitle = "All movies with atleast 30 user votes until 2025-05-10. Colors represent release year.",
+    caption = caption
+  ) +
+  theme(
+    # legend.position = "top",
+    # legend.title = element_blank(),
+    # legend.text = element_text(size = 5, margin = margin(c(0.05, 0.0, 0.0, 0.0), unit = "cm")),
+    # legend.key.width = unit(1.5, unit = "cm"),
+    # legend.key.height = unit(0.25, unit = "cm"),
+    # legend.margin = margin(c(0.0, 0.5, -0.2, 0.4), unit = "cm"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+  ) +
+  facet_wrap(~startYear)
+
+ggsave("imdb_umap_rating_year.png", plot, width = 4, height = 4)
+```
