@@ -292,3 +292,60 @@ plot <- ggplot(df_models_f, aes(x = test_mse, y = model, fill = model_type, colo
 
 ggsave("model_comparison_base.png", plot, width = 4, height = 2.5)
 ```
+
+```{r}
+df_manual <- data.frame(
+  model = c("MLPOnEmbeddings", "LLMFromScratch", "LinearRegression"),
+  test_mse = c(1.074, 1.046, 1.1870156526565552),
+  model_type = c("Neural\nNetwork", "Neural\nNetwork", "Traditional\nModel")
+)
+
+
+df_models_f2 <- df_models_f |>
+  select(model, test_mse, model_type) |>
+  union(df_manual) |>
+  arrange(test_mse) |>
+  mutate(model = factor(model, levels = model))
+
+df_models_f2
+```
+
+```{r}
+colors <- c("Traditional\nModel" = "#27ae60", "Neural\nNetwork" = "#2980b9")
+
+plot <- ggplot(df_models_f2, aes(x = test_mse, y = model, fill = model_type, color = model_type)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = test_mse |> round(3)), family = "Overpass", fontface = "bold", size = 2.5, nudge_x = 0.15) +
+  scale_x_continuous(limits = c(0, 1.5)) +
+  scale_y_discrete(limits = rev) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = colors) +
+  labs(
+    title = "Model Performance For Predicting\nIMDb Average Movie Ratings w/ LLM Embeddings",
+    # subtitle = "For all IMDb movies with atleast 30 user votes until 2025-05-10.",
+    x = "Test MSE Loss of Best Model (Lower is Better)",
+    # fill = "Implementation Correctness",
+    caption = caption
+  ) +
+  theme(
+    # legend.position = "top",
+    legend.title = element_blank(),
+    # legend.text = element_text(size = 5, margin = margin(c(0.0, 0.0, 0.0, 0.1), unit = "cm")),
+    # legend.key.width = unit(0.50, unit = "cm"),
+    # legend.key.height = unit(0.25, unit = "cm"),
+    # legend.margin = margin(c(0.0, 0.5, -0.2, 0.4), unit = "cm"),
+    axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5),
+    axis.text.y = element_text(size = 6),
+    # axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    # axis.ticks = element_line(linewidth = 0.5, color = "#969696"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    # plot.subtitle = element_text(hjust = 0.5),
+    # axis.ticks.length.x = unit(., "cm"),
+    # axis.ticks.length.y = unit(.25, "cm"),
+  )
+
+ggsave("model_comparison_all.png", plot, width = 4, height = 2.5)
+```
