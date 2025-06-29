@@ -3,6 +3,7 @@ library(tidyverse)
 library(scales)
 library(RColorBrewer)
 library(arrow)
+library(ggtext)
 
 caption <- "Max Woolf — minimaxir.com"
 
@@ -119,4 +120,35 @@ plot <- ggplot(df |> left_join(all_data) |> filter(startYear >= 1996), aes(x = x
   facet_wrap(~startYear)
 
 ggsave("imdb_umap_rating_year.png", plot, width = 4, height = 4)
+```
+
+## Mini-EDA
+
+```{r}
+
+```
+
+## Actor Distribution by Unique Movies
+
+```{r}
+df_actors <- read_parquet("/Users/maxwoolf/Downloads/actor_agg.parquet")
+
+df_actors |> head()
+```
+
+```{r}
+plot <- ggplot(df_actors |> head(100000) |> mutate(row_n = row_number()), aes(x = row_n, y = movie_count)) +
+  geom_bar(stat = "identity", color = "#2f3640") +
+  labs(
+    title = "# of Movies An Actor Has Acted In, Sorted From Most Prolific to Least Prolific",
+    subtitle = "For all IMDb movies with atleast 30 user votes until 2025-05-10.",
+    x = "*n*th Unique Actor",
+    y = "# of Total Movies Actor Has Acted In",
+    caption = caption
+  ) +
+  theme(
+    axis.title.x = element_markdown()
+  )
+
+ggsave("actor_cum_dist.png", plot, width = 5, height = 2.5)
 ```
