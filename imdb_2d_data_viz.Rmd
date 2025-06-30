@@ -164,12 +164,6 @@ df_train_mlp_long |> head()
 ```
 
 ```{r}
-df_train_mlp_long |>
-  filter(loss_type == "test_loss") |>
-  filter(loss == min(loss))
-```
-
-```{r}
 df_train_llm <- read_parquet("llm_scratch_train_logs.parquet")
 
 df_train_llm |> head()
@@ -188,12 +182,16 @@ min_test_loss <- df_train_mlp_long |>
   filter(loss_type == "test_loss") |>
   filter(loss == min(loss))
 
+mlp_loss <- min_test_loss |> pull(loss)
+
 plot <- ggplot(df_train_mlp_long, aes(x = epoch, y = loss, color = loss_type, fill = loss_type)) +
   geom_line() +
   geom_point(data = min_test_loss, shape = 21, color = "white") +
-  geom_label(data = min_test_loss, aes(label = loss |> round(3), y = loss - 0.025), family = "Overpass", color = "white", show.legend = FALSE, size = 2) +
+  geom_label(data = min_test_loss, aes(label = loss |> round(3), y = loss - 0.025), family = "Overpass", fontface = "bold", color = "white", show.legend = FALSE, size = 2) +
   scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 100)) +
   scale_y_continuous(limits = c(0.8, 1.2), breaks = seq(0.8, 1.2, 0.1)) +
+  scale_color_hue(l = 50) +
+  scale_fill_hue(l = 50) +
   labs(
     title = "Training Loss for MLP to Predict IMDb Average Movie Ratings",
     subtitle = "For all IMDb movies with atleast 30 user votes until 2025-05-10.",
@@ -213,12 +211,16 @@ min_test_loss <- df_train_llm_long |>
   filter(loss_type == "test_loss") |>
   filter(loss == min(loss))
 
+llm_loss <- min_test_loss |> pull(loss)
+
 plot <- ggplot(df_train_llm_long, aes(x = epoch, y = loss, color = loss_type, fill = loss_type)) +
   geom_line() +
   geom_point(data = min_test_loss, shape = 21, color = "white") +
-  geom_label(data = min_test_loss, aes(label = loss |> round(3), y = loss - 0.025), family = "Overpass", color = "white", show.legend = FALSE, size = 2) +
+  geom_label(data = min_test_loss, aes(label = loss |> round(3), y = loss - 0.03), family = "Overpass", fontface = "bold", color = "white", show.legend = FALSE, size = 2) +
   scale_x_continuous(limits = c(0, 10), breaks = seq(0, 10, 1)) +
-  scale_y_continuous(limits = c(0.8, 1.2), breaks = seq(0.8, 1.2, 0.1)) +
+  scale_y_continuous(limits = c(0.6, 1.2), breaks = seq(0.6, 1.2, 0.1)) +
+  scale_color_hue(l = 50) +
+  scale_fill_hue(l = 50) +
   labs(
     title = "Training Loss for LLM to Predict IMDb Average Movie Ratings",
     subtitle = "For all IMDb movies with atleast 30 user votes until 2025-05-10.",
@@ -277,7 +279,7 @@ plot <- ggplot(df_models_f, aes(x = test_mse, y = model, fill = model_type, colo
     # legend.key.width = unit(0.50, unit = "cm"),
     # legend.key.height = unit(0.25, unit = "cm"),
     # legend.margin = margin(c(0.0, 0.5, -0.2, 0.4), unit = "cm"),
-    axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5),
+    axis.text.x = element_text(size = 6),
     axis.text.y = element_text(size = 6),
     # axis.title.x = element_blank(),
     axis.title.y = element_blank(),
@@ -296,7 +298,7 @@ ggsave("model_comparison_base.png", plot, width = 4, height = 2.5)
 ```{r}
 df_manual <- data.frame(
   model = c("MLPOnEmbeddings", "LLMFromScratch", "LinearRegression"),
-  test_mse = c(1.074, 1.046, 1.1870156526565552),
+  test_mse = c(mlp_loss, llm_loss, 1.1870156526565552),
   model_type = c("Neural\nNetwork", "Neural\nNetwork", "Traditional\nModel")
 )
 
@@ -334,7 +336,7 @@ plot <- ggplot(df_models_f2, aes(x = test_mse, y = model, fill = model_type, col
     # legend.key.width = unit(0.50, unit = "cm"),
     # legend.key.height = unit(0.25, unit = "cm"),
     # legend.margin = margin(c(0.0, 0.5, -0.2, 0.4), unit = "cm"),
-    axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5),
+    axis.text.x = element_text(size = 6),
     axis.text.y = element_text(size = 6),
     # axis.title.x = element_blank(),
     axis.title.y = element_blank(),
